@@ -95,6 +95,13 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
+        if (gameMode == 'main-game')
+        {
+            updateMainGameEntities(dt);
+        }
+    }
+
+    function updateMainGameEntities(dt) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
@@ -147,9 +154,25 @@ var Engine = (function(global) {
      * on your enemy and player entities within app.js
      */
     function renderEntities() {
-        /* Loop through all of the objects within the allEnemies array and call
-         * the render function you have defined.
-         */
+        if (gameMode == 'player-selection')
+        {
+            renderPlayerSelectionEntities();
+        }
+        else if (gameMode == 'main-game')
+        {
+            renderMainGameEntities();
+        }
+    }
+
+    function renderPlayerSelectionEntities() {
+        selector.render();
+        
+        allSelectees.forEach(function(selectee) {
+            selectee.render();
+        });
+    }
+
+    function renderMainGameEntities() {
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
@@ -170,11 +193,22 @@ var Engine = (function(global) {
      * all of these images are properly loaded our game will start.
      */
     Resources.load([
-        'images/stone-block.png',
-        'images/water-block.png',
-        'images/grass-block.png',
+        'images/char-boy.png',
+        'images/char-cat-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-princess-girl.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/gem-blue.png',
+        'images/gem-green.png',
+        'images/gem-orange.png',
+        'images/grass-block.png',
+        'images/heart.png',
+        'images/rock.png',
+        'images/selector.png',
+        'images/star.png',
+        'images/stone-block.png',
+        'images/water-block.png'
     ]);
     Resources.onReady(init);
 

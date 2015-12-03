@@ -5,26 +5,44 @@ var numRows = 6;
 var numCols = 5;
 
 var numOfEnemies = 5;
+var numOfPlayerCharacters = 5;
 
 var minX = 0;
 var minXEnemy = minX - colWidth;
 var minXPlayer = minX;
+var minXSelector = minXPlayer;
 
 var minY = 0;
 var minYEnemy = minY + rowHeight;
-var minYPlayer = minY - rowHeight;
+var minYPlayer = minY;
+var minYSelector = maxY - rowHeight*3;
 
 var maxX = colWidth*numCols;
 var maxXEnemy = maxX;
 var maxXPlayer = maxX - colWidth;
+var maxXSelector = maxXPlayer;
 
 var maxY = rowHeight*numRows;
 var maxYEnemy = rowHeight*4;
 var maxYPlayer = maxY - rowHeight;
+var maxYSelector = maxY - rowHeight*3;
 
 var iniXPlayer = Math.floor(numCols / 2) * colWidth;
 var iniYPlayer = maxYPlayer;
 
+var iniXSelector = iniXPlayer;
+var iniYSelector = maxY - rowHeight*3;
+
+var playerSprites = [];
+playerSprites[0] = 'images/char-boy.png';
+playerSprites[1] = 'images/char-cat-girl.png';
+playerSprites[2] = 'images/char-horn-girl.png';
+playerSprites[3] = 'images/char-pink-girl.png';
+playerSprites[4] = 'images/char-princess-girl.png';
+
+// Game Mode
+// player-selection = player selection screen
+// main-game = main game screen
 
 // Enemies our player must avoid
 var Enemy = function() {
@@ -127,9 +145,82 @@ Player.prototype.reset = function() {
     this.y = iniYPlayer;
 }
 
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
+// Selector Class
+// Defines selector object
+// used during player selection
+var Selector = function() {
+    this.sprite = 'images/selector.png';
+    this.x = iniXSelector;
+    this.y = iniYSelector;
+};
+
+Selector.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+Selector.prototype.handleInput = function(keyPressed) {
+    var dx = colWidth;
+    var dy = rowHeight;
+    if (keyPressed == 'left') {
+        if (this.x - dx >= minXSelector) {
+            this.x -= dx;
+        }
+    } else if (keyPressed == 'right') {
+        if (this.x + dx <= maxXSelector) {
+            this.x += dx;
+        }
+    } else if (keyPressed == 'up') {
+        if (this.y - dy >= minYSelector) {
+            this.y -= dy;
+        }
+    } else if (keyPressed == 'down') {
+        if (this.y + dy <= maxYSelector) {
+            this.y += dy;
+        }
+    }
+}
+
+Selector.prototype.reset = function() {
+    this.x = iniXSelector;
+    this.y = iniYSelector;
+}
+
+// Selectee Class
+// Defines selectee (player to be selected) object
+// used during player selection
+var Selectee = function() {
+    this.sprite = 'images/star.png';
+    this.x = iniXSelector;
+    this.y = iniYSelector;
+};
+
+Selectee.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+Selectee.prototype.handleInput = function(keyPressed) {
+    var dx = colWidth;
+    var dy = rowHeight;
+    if (keyPressed == 'enter') {
+        if (this.x === selector.x && this.y === selector.y)
+        {
+            player.sprite = this.sprite;
+            gameMode = 'main-game';
+        }
+    }
+}
+
+// game initialization
+gameMode = 'player-selection';
+
+allSelectees = [];
+for (var i=0; i<numOfPlayerCharacters; i++) {
+    allSelectees[i] = new Selectee();
+    allSelectees[i].x = i * colWidth;
+    allSelectees[i].sprite = playerSprites[i];
+}
+
+selector = new Selector();
 
 allEnemies = [];
 for (var i=0; i<numOfEnemies; i++) {
@@ -142,15 +233,25 @@ for (var i=0; i<numOfEnemies; i++) {
 
 player = new Player();
 
-// This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
     var allowedKeys = {
+        13: 'enter',
         37: 'left',
         38: 'up',
         39: 'right',
-        40: 'down'
+        40: 'down',
+        80: 'p'
     };
 
-    player.handleInput(allowedKeys[e.keyCode]);
+    if (gameMode == 'player-selection')
+    {
+        selector.handleInput(allowedKeys[e.keyCode]);
+        allSelectees.forEach(function(selectee) {
+            selectee.handleInput(allowedKeys[e.keyCode]);
+        });
+    }
+    else if (gameMode == 'main-game')
+    {
+        player.handleInput(allowedKeys[e.keyCode]);
+    }
 });
