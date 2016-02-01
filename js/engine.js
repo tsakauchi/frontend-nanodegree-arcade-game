@@ -33,6 +33,11 @@ var Engine = (function(global) {
     canvas.height = 606;
     doc.body.appendChild(canvas);
 
+    /* This global variable is used by app.js to tell the engine
+     * when the reset function should be called
+     */
+    global.isGameReset = true;
+
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
@@ -83,6 +88,9 @@ var Engine = (function(global) {
      * on the entities themselves within your app.js file).
      */
     function update(dt) {
+        if (global.isGameReset) {
+            reset();
+        }
         updateEntities(dt);
         // checkCollisions();
     }
@@ -104,6 +112,9 @@ var Engine = (function(global) {
     function updateMainGameEntities(dt) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
+        });
+        allObstacles.forEach(function(obstacle) {
+            obstacle.update();
         });
         player.update();
     }
@@ -177,17 +188,30 @@ var Engine = (function(global) {
             enemy.render();
         });
 
+        allObstacles.forEach(function(obstacle) {
+            obstacle.render();
+        });
         player.render();
     }
 
-    /* This function does nothing but it could have been a good place to
-     * handle game reset states - maybe a new game menu or a game over screen
-     * those sorts of things. It's only called once by the init() method.
+    /* This function handles resetting the game
+     * Game-mode specific reset function is called
      */
     function reset() {
-        // noop
+        if (gameMode == 'main-game')
+        {
+            resetMainGameEntities();
+        }
+        global.isGameReset = false;
     }
 
+    function resetMainGameEntities() {
+        allObstacles.forEach(function(obstacle) {
+            obstacle.reset();
+        });
+        player.reset();
+    }
+    
     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when
      * all of these images are properly loaded our game will start.

@@ -11,21 +11,25 @@ var minX = 0;
 var minXEnemy = minX - colWidth;
 var minXPlayer = minX;
 var minXSelector = minXPlayer;
+var minXObstacle = minX;
 
 var minY = 0;
 var minYEnemy = minY + rowHeight;
 var minYPlayer = minY;
 var minYSelector = maxY - rowHeight*3;
+var minYObstacle = minY + rowHeight*4;
 
 var maxX = colWidth*numCols;
 var maxXEnemy = maxX;
 var maxXPlayer = maxX - colWidth;
 var maxXSelector = maxXPlayer;
+var maxXObstacle = maxX;
 
 var maxY = rowHeight*numRows;
 var maxYEnemy = rowHeight*4;
 var maxYPlayer = maxY - rowHeight;
 var maxYSelector = maxY - rowHeight*3;
+var maxYObstacle = maxY - rowHeight*2;
 
 var iniXPlayer = Math.floor(numCols / 2) * colWidth;
 var iniYPlayer = maxYPlayer;
@@ -84,7 +88,7 @@ Enemy.prototype.update = function(dt) {
 
     if (xMPlayer <= x0Enemy || x0Player >= xMEnemy) return;
 
-    player.reset();
+    isGameReset = true;
 };
 
 // Draw the enemy on the screen, required method for game
@@ -101,15 +105,16 @@ var Player = function() {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/char-boy.png';
-    this.x = iniXPlayer;
-    this.y = iniYPlayer;
+    this.x = 0;
+    this.y = 0;
+    this.reset();
 };
 
 // This class requires an update(), render() and
 // a handleInput() method.
 Player.prototype.update = function(dt) {
     if (player.y === minYPlayer) {
-        player.reset();
+        isGameReset = true;
     }
 };
 
@@ -210,8 +215,55 @@ Selectee.prototype.handleInput = function(keyPressed) {
     }
 }
 
+var Obstacle = function() {
+    this.sprite = 'images/rock.png';
+    this.x = 0;
+    this.y = 0;
+    this.reset();
+};
+
+// Collision detection
+Obstacle.prototype.update = function() {
+
+    if (this.y !== player.y) return;
+
+    var spriteObstacle = Resources.get(this.sprite);
+    var spritePlayer = Resources.get(player.sprite);
+    var x0Obstacle = this.x;
+    var xMObstacle = x0Obstacle + spriteObstacle.width;
+    var x0Player = player.x;
+    var xMPlayer = x0Player + spritePlayer.width;
+
+    if (xMPlayer <= x0Obstacle || x0Player >= xMObstacle) return;
+
+    isGameReset = true;
+};
+
+Obstacle.prototype.reset = function() {
+    var minC = minXObstacle/colWidth;
+    var minR = minYObstacle/rowHeight;
+    var maxC = maxXObstacle/colWidth;
+    var maxR = maxYObstacle/rowHeight;
+
+    var rndC = Math.floor((Math.random() * (maxC - minC + 1)) + minC);
+    var rndR = Math.floor((Math.random() * (maxR - minR + 1)) + minR);
+
+    this.x = rndC*colWidth;
+    this.y = rndR*rowHeight;
+}
+
+Obstacle.prototype.render = function() {
+    // ctx globally provided by engine.js
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
 // game initialization
 gameMode = 'player-selection';
+
+// game state
+// active - game is running
+// 
+gameState = 'active';
 
 allSelectees = [];
 for (var i=0; i<numOfPlayerCharacters; i++) {
@@ -229,6 +281,11 @@ for (var i=0; i<numOfEnemies; i++) {
     allEnemies[i] = new Enemy();
     allEnemies[i].y = row * rowHeight;
     allEnemies[i].speed *= multiplier;
+}
+
+allObstacles = [];
+for (var i=0; i<3; i++) {
+    allObstacles[i] = new Obstacle();
 }
 
 player = new Player();
