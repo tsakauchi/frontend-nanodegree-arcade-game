@@ -6,6 +6,7 @@ var numCols = 5;
 
 var numOfEnemies = 5;
 var numOfPlayerCharacters = 5;
+var numOfObstacles = 3;
 
 var minX = 0;
 var minXEnemy = minX - colWidth;
@@ -88,6 +89,9 @@ Enemy.prototype.update = function(dt) {
 
     if (xMPlayer <= x0Enemy || x0Player >= xMEnemy) return;
 
+    gameScore -= 50;
+    if (gameScore < 0) gameScore = 0;
+    
     isGameReset = true;
 };
 
@@ -114,6 +118,9 @@ var Player = function() {
 // a handleInput() method.
 Player.prototype.update = function(dt) {
     if (player.y === minYPlayer) {
+
+        gameScore += 200;
+    
         isGameReset = true;
     }
 };
@@ -236,6 +243,9 @@ Obstacle.prototype.update = function() {
 
     if (xMPlayer <= x0Obstacle || x0Player >= xMObstacle) return;
 
+    gameScore -= 25;
+    if (gameScore < 0) gameScore = 0;
+
     isGameReset = true;
 };
 
@@ -284,7 +294,7 @@ for (var i=0; i<numOfEnemies; i++) {
 }
 
 allObstacles = [];
-for (var i=0; i<3; i++) {
+for (var i=0; i<numOfObstacles; i++) {
     allObstacles[i] = new Obstacle();
 }
 

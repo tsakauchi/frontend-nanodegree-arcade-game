@@ -38,6 +38,12 @@ var Engine = (function(global) {
      */
     global.isGameReset = true;
 
+    /* This global variable is for keeping track the game score
+     * Unfortunately, it is the caller's responsibility to 
+     * make sure that the score is non-negative
+     */
+    global.gameScore = 0;
+
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
@@ -191,7 +197,19 @@ var Engine = (function(global) {
         allObstacles.forEach(function(obstacle) {
             obstacle.render();
         });
+
         player.render();
+
+        renderScore();
+    }
+
+    function renderScore() {
+        ctx.fillStyle="#FFFFFF";
+        ctx.fillRect(300,0,220,40); 
+        ctx.fillStyle="#000000";
+        ctx.textAlign="right"; 
+        ctx.font = "24px verdana";
+        ctx.fillText(global.gameScore, 500, 30);
     }
 
     /* This function handles resetting the game
