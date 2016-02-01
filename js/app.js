@@ -82,7 +82,7 @@ Enemy.prototype.update = function(dt) {
     var x0Player = player.x;
     var xMPlayer = x0Player + spritePlayer.width;
 
-    if (xMPlayer < x0Enemy || x0Player > xMEnemy) return;
+    if (xMPlayer <= x0Enemy || x0Player >= xMEnemy) return;
 
     player.reset();
 };
