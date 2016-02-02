@@ -116,12 +116,18 @@ var Engine = (function(global) {
     }
 
     function updateMainGameEntities(dt) {
+        allItems.forEach(function(item) {
+            item.update();
+        });
+
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
+
         allObstacles.forEach(function(obstacle) {
             obstacle.update();
         });
+
         player.update();
     }
 
@@ -190,6 +196,10 @@ var Engine = (function(global) {
     }
 
     function renderMainGameEntities() {
+        allItems.forEach(function(item) {
+            item.render();
+        });
+
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
@@ -224,9 +234,14 @@ var Engine = (function(global) {
     }
 
     function resetMainGameEntities() {
+        allItems.forEach(function(item) {
+            item.reset();
+        });
+
         allObstacles.forEach(function(obstacle) {
             obstacle.reset();
         });
+
         player.reset();
     }
     

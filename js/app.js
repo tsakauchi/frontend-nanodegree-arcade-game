@@ -7,30 +7,35 @@ var numCols = 5;
 var numOfEnemies = 5;
 var numOfPlayerCharacters = 5;
 var numOfObstacles = 3;
+var numOfItems = 2;
 
 var minX = 0;
 var minXEnemy = minX - colWidth;
 var minXPlayer = minX;
 var minXSelector = minXPlayer;
 var minXObstacle = minX;
+var minXItem = minX;
 
 var minY = 0;
 var minYEnemy = minY + rowHeight;
 var minYPlayer = minY;
 var minYSelector = maxY - rowHeight*3;
 var minYObstacle = minY + rowHeight*4;
+var minYItem = minY + rowHeight;
 
 var maxX = colWidth*numCols;
 var maxXEnemy = maxX;
 var maxXPlayer = maxX - colWidth;
 var maxXSelector = maxXPlayer;
 var maxXObstacle = maxX;
+var maxXItem = maxX;
 
 var maxY = rowHeight*numRows;
 var maxYEnemy = rowHeight*4;
 var maxYPlayer = maxY - rowHeight;
 var maxYSelector = maxY - rowHeight*3;
 var maxYObstacle = maxY - rowHeight*2;
+var maxYItem = rowHeight*3;
 
 var iniXPlayer = Math.floor(numCols / 2) * colWidth;
 var iniYPlayer = maxYPlayer;
@@ -49,6 +54,9 @@ playerSprites[4] = 'images/char-princess-girl.png';
 // player-selection = player selection screen
 // main-game = main game screen
 
+/**********************************************************
+ * Enemy Class
+ **********************************************************/
 // Enemies our player must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
@@ -101,7 +109,9 @@ Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now write your own player class
+/**********************************************************
+ * Player Class
+ **********************************************************/
 var Player = function() {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
@@ -157,7 +167,9 @@ Player.prototype.reset = function() {
     this.y = iniYPlayer;
 }
 
-// Selector Class
+/**********************************************************
+ * Selector Class
+ **********************************************************/
 // Defines selector object
 // used during player selection
 var Selector = function() {
@@ -222,6 +234,11 @@ Selectee.prototype.handleInput = function(keyPressed) {
     }
 }
 
+/**********************************************************
+ * Obstacle Class
+ **********************************************************/
+ // represents obstacles that cause loss of points
+ // when touched by player
 var Obstacle = function() {
     this.sprite = 'images/rock.png';
     this.x = 0;
@@ -267,6 +284,64 @@ Obstacle.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+/**********************************************************
+ * Item Class
+ **********************************************************/
+ // represents items that increase points when
+ // touched by the player
+var Item = function() {
+    this.sprite = 'images/gem-blue.png';
+    this.x = 0;
+    this.y = 0;
+    this.isVisible = true;
+    this.reset();
+};
+
+// Collision detection
+Item.prototype.update = function() {
+
+    if (!this.isVisible) return;
+
+    if (this.y !== player.y) return;
+
+    var spriteItem = Resources.get(this.sprite);
+    var spritePlayer = Resources.get(player.sprite);
+    var x0Item = this.x;
+    var xMItem = x0Item + spriteItem.width;
+    var x0Player = player.x;
+    var xMPlayer = x0Player + spritePlayer.width;
+
+    if (xMPlayer <= x0Item || x0Player >= xMItem) return;
+
+    gameScore += 100;
+
+    this.isVisible = false;
+};
+
+Item.prototype.reset = function() {
+    var minC = minXItem/colWidth;
+    var minR = minYItem/rowHeight;
+    var maxC = maxXItem/colWidth;
+    var maxR = maxYItem/rowHeight;
+
+    var rndC = Math.floor((Math.random() * (maxC - minC + 1)) + minC);
+    var rndR = Math.floor((Math.random() * (maxR - minR + 1)) + minR);
+
+    this.x = rndC*colWidth;
+    this.y = rndR*rowHeight;
+
+    this.isVisible = true;
+}
+
+Item.prototype.render = function() {
+    if (!this.isVisible) return;
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+/**********************************************************
+ * Game Initialization
+ **********************************************************/
+
 // game initialization
 gameMode = 'player-selection';
 
@@ -283,6 +358,11 @@ for (var i=0; i<numOfPlayerCharacters; i++) {
 }
 
 selector = new Selector();
+
+allItems = [];
+for (var i=0; i<numOfItems; i++) {
+    allItems[i] = new Item();
+}
 
 allEnemies = [];
 for (var i=0; i<numOfEnemies; i++) {
