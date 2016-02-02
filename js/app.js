@@ -117,7 +117,7 @@ var Player = function() {
 // This class requires an update(), render() and
 // a handleInput() method.
 Player.prototype.update = function(dt) {
-    if (player.y === minYPlayer) {
+    if (this.y === minYPlayer) {
 
         gameScore += 200;
     
