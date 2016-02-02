@@ -160,12 +160,12 @@ Player.prototype.handleInput = function(keyPressed) {
             this.y += dy;
         }
     }
-}
+};
 
 Player.prototype.reset = function() {
     this.x = iniXPlayer;
     this.y = iniYPlayer;
-}
+};
 
 /**********************************************************
  * Selector Class
@@ -202,12 +202,12 @@ Selector.prototype.handleInput = function(keyPressed) {
             this.y += dy;
         }
     }
-}
+};
 
 Selector.prototype.reset = function() {
     this.x = iniXSelector;
     this.y = iniYSelector;
-}
+};
 
 // Selectee Class
 // Defines selectee (player to be selected) object
@@ -232,7 +232,7 @@ Selectee.prototype.handleInput = function(keyPressed) {
             gameMode = 'main-game';
         }
     }
-}
+};
 
 /**********************************************************
  * Obstacle Class
@@ -277,7 +277,7 @@ Obstacle.prototype.reset = function() {
 
     this.x = rndC*colWidth;
     this.y = rndR*rowHeight;
-}
+};
 
 Obstacle.prototype.render = function() {
     // ctx globally provided by engine.js
@@ -331,7 +331,7 @@ Item.prototype.reset = function() {
     this.y = rndR*rowHeight;
 
     this.isVisible = true;
-}
+};
 
 Item.prototype.render = function() {
     if (!this.isVisible) return;
