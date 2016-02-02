@@ -33,6 +33,13 @@ var Engine = (function(global) {
     canvas.height = 606;
     doc.body.appendChild(canvas);
 
+    /* This global variable is for keeping track the current
+     * game mode.
+     *  player-selection: display player selection screen
+     *  main-game: display game screen
+     */
+    global.gameMode = 'player-selection';
+  
     /* This global variable is used by app.js to tell the engine
      * when the reset function should be called
      */
@@ -109,7 +116,7 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
-        if (gameMode == 'main-game')
+        if (global.gameMode == 'main-game')
         {
             updateMainGameEntities(dt);
         }
@@ -177,11 +184,11 @@ var Engine = (function(global) {
      * on your enemy and player entities within app.js
      */
     function renderEntities() {
-        if (gameMode == 'player-selection')
+        if (global.gameMode == 'player-selection')
         {
             renderPlayerSelectionEntities();
         }
-        else if (gameMode == 'main-game')
+        else if (global.gameMode == 'main-game')
         {
             renderMainGameEntities();
         }
@@ -226,7 +233,7 @@ var Engine = (function(global) {
      * Game-mode specific reset function is called
      */
     function reset() {
-        if (gameMode == 'main-game')
+        if (global.gameMode == 'main-game')
         {
             resetMainGameEntities();
         }
