@@ -213,8 +213,6 @@ Selectee.prototype.render = function() {
 };
 
 Selectee.prototype.handleInput = function(keyPressed) {
-    var dx = colWidth;
-    var dy = rowHeight;
     if (keyPressed == 'enter') {
         if (this.x === selector.x && this.y === selector.y)
         {
