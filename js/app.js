@@ -1,3 +1,11 @@
+/**********************************************************
+ * app.js
+ * Contains class definitions and initialization routine
+ **********************************************************/
+
+ /**********************************************************
+ * Constants
+ **********************************************************/
 var colWidth = 101;
 var rowHeight = 83;
 var numRows = 6;
@@ -49,14 +57,14 @@ playerSprites[2] = 'images/char-horn-girl.png';
 playerSprites[3] = 'images/char-pink-girl.png';
 playerSprites[4] = 'images/char-princess-girl.png';
 
-// Game Mode
-// player-selection = player selection screen
-// main-game = main game screen
-
 /**********************************************************
  * Enemy Class
  **********************************************************/
-// Enemies our player must avoid
+
+/**
+ * @description Represents an enemy our player must avoid
+ * @constructor
+ */
 var Enemy = function() {
     this.sprite = 'images/enemy-bug.png';
     this.x = 0;
@@ -64,9 +72,15 @@ var Enemy = function() {
     this.speed = 20;
 };
 
-// Update the enemy's position
-// Parameter: dt, a time delta between ticks
+/**
+* @description Update the enemy's position based on time delta.
+* Responsible for calculating current position, collision detection,
+* game score manipulation, and triggering game reset.
+* @param {number} dt, time delta between ticks
+*/
 Enemy.prototype.update = function(dt) {
+
+    // calculate current position
     var dx = this.speed * dt;
     if (this.x + dx > maxXEnemy) {
         this.x = minXEnemy;
@@ -76,7 +90,7 @@ Enemy.prototype.update = function(dt) {
         this.x += dx;
     }
 
-    // collision detection here
+    // collision detection
     if (this.y !== player.y) return;
 
     var spriteEnemy = Resources.get(this.sprite);
@@ -88,13 +102,17 @@ Enemy.prototype.update = function(dt) {
 
     if (xMPlayer <= x0Enemy || x0Player >= xMEnemy) return;
 
+    // game score manipulation
     gameScore -= 50;
     if (gameScore < 0) gameScore = 0;
     
+    // trigger game reset
     isGameReset = true;
 };
 
-// Draw the enemy on the screen
+/**
+* @description Draw the enemy on the screen.
+*/
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
@@ -102,34 +120,50 @@ Enemy.prototype.render = function() {
 /**********************************************************
  * Player Class
  **********************************************************/
-var Player = function() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
 
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
+/**
+ * @description Represents a player controlled by the user
+ * @constructor
+ */
+var Player = function() {
     this.sprite = 'images/char-boy.png';
     this.x = 0;
     this.y = 0;
     this.reset();
 };
 
-// This class requires an update(), render() and
-// a handleInput() method.
-Player.prototype.update = function(dt) {
-    if (this.y === minYPlayer) {
 
-        gameScore += 200;
-    
-        isGameReset = true;
-    }
+/**
+* @description Evaluates player state based on its position.
+* Responsible for collision detection, game score manipulation,
+* and triggering game reset.
+*/
+Player.prototype.update = function() {
+
+    // collision detection
+    // (did I 'collide' with the goal?)
+    if (this.y != minYPlayer) return;
+
+    // game score manipulation
+    gameScore += 200;
+
+    // trigger game reset
+    isGameReset = true;
 };
 
+/**
+* @description Draw the player on the screen.
+*/
 Player.prototype.render = function() {
-    // ctx globally provided by engine.js
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+/**
+* @description Handle user input
+* Responsible for calculating current position based on
+* user input.
+* @param {string} keyPressed, string that describes key pressed
+*/
 Player.prototype.handleInput = function(keyPressed) {
     var dx = colWidth;
     var dy = rowHeight;
@@ -152,6 +186,9 @@ Player.prototype.handleInput = function(keyPressed) {
     }
 };
 
+/**
+* @description Reset player state.
+*/
 Player.prototype.reset = function() {
     this.x = iniXPlayer;
     this.y = iniYPlayer;
@@ -160,18 +197,31 @@ Player.prototype.reset = function() {
 /**********************************************************
  * Selector Class
  **********************************************************/
-// Defines selector object
-// used during player selection
+
+/**
+ * @description Represents a selector controlled by the user
+ * used during player selection
+ * @constructor
+ */
 var Selector = function() {
     this.sprite = 'images/selector.png';
     this.x = iniXSelector;
     this.y = iniYSelector;
 };
 
+/**
+* @description Draw the player on the screen.
+*/
 Selector.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+/**
+* @description Handle user input
+* Responsible for calculating current position based on
+* user input.
+* @param {string} keyPressed, string that describes key pressed
+*/
 Selector.prototype.handleInput = function(keyPressed) {
     var dx = colWidth;
     var dy = rowHeight;
@@ -194,24 +244,42 @@ Selector.prototype.handleInput = function(keyPressed) {
     }
 };
 
+/**
+* @description Reset selector state.
+*/
 Selector.prototype.reset = function() {
     this.x = iniXSelector;
     this.y = iniYSelector;
 };
 
-// Selectee Class
-// Defines selectee (player to be selected) object
-// used during player selection
+/**********************************************************
+ * Selectee Class
+ **********************************************************/
+
+/**
+ * @description Represents a selectee (player to be selected)
+ * by the selector. Used during player selection.
+ * @constructor
+ */
 var Selectee = function() {
     this.sprite = 'images/star.png';
     this.x = iniXSelector;
     this.y = iniYSelector;
 };
 
+/**
+* @description Draw the player on the screen.
+*/
 Selectee.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+/**
+* @description Handle user input
+* Responsible for calculating current position based on
+* user input.
+* @param {string} keyPressed, string that describes key pressed
+*/
 Selectee.prototype.handleInput = function(keyPressed) {
     if (keyPressed == 'enter') {
         if (this.x === selector.x && this.y === selector.y)
@@ -225,8 +293,12 @@ Selectee.prototype.handleInput = function(keyPressed) {
 /**********************************************************
  * Obstacle Class
  **********************************************************/
- // represents obstacles that cause loss of points
- // when touched by player
+ 
+ /**
+ * @description Represents an obstacle that causes loss of
+ * points when touched by the player.
+ * @constructor
+ */
 var Obstacle = function() {
     this.sprite = 'images/rock.png';
     this.x = 0;
@@ -234,9 +306,13 @@ var Obstacle = function() {
     this.reset();
 };
 
-// Collision detection
+/**
+* @description Responsible for collision detection,
+* game score manipulation, and triggering game reset.
+*/
 Obstacle.prototype.update = function() {
 
+    // collision detection
     if (this.y !== player.y) return;
 
     var spriteObstacle = Resources.get(this.sprite);
@@ -248,12 +324,19 @@ Obstacle.prototype.update = function() {
 
     if (xMPlayer <= x0Obstacle || x0Player >= xMObstacle) return;
 
+    // game score manipulation
     gameScore -= 25;
     if (gameScore < 0) gameScore = 0;
 
+    // game reset trigger
     isGameReset = true;
 };
 
+/**
+* @description Reset obstacle state.
+* This also calculates the initial position of the obstacle
+* using random number.
+*/
 Obstacle.prototype.reset = function() {
     var minC = minXObstacle/colWidth;
     var minR = minYObstacle/rowHeight;
@@ -267,16 +350,22 @@ Obstacle.prototype.reset = function() {
     this.y = rndR*rowHeight;
 };
 
+/**
+* @description Draw the obstacle on screen
+*/
 Obstacle.prototype.render = function() {
-    // ctx globally provided by engine.js
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
 /**********************************************************
  * Item Class
  **********************************************************/
- // represents items that increase points when
- // touched by the player
+ 
+ /**
+ * @description Represents an item that causes points
+ * to increase when touched by the player.
+ * @constructor
+ */
 var Item = function() {
     this.sprite = 'images/gem-blue.png';
     this.x = 0;
@@ -285,9 +374,13 @@ var Item = function() {
     this.reset();
 };
 
-// Collision detection
+/**
+* @description Responsible for collision detection,
+* game score manipulation, and object visibility.
+*/
 Item.prototype.update = function() {
 
+    // collision detection
     if (!this.isVisible) return;
 
     if (this.y !== player.y) return;
@@ -301,11 +394,18 @@ Item.prototype.update = function() {
 
     if (xMPlayer <= x0Item || x0Player >= xMItem) return;
 
+    // game score manipulation
     gameScore += 100;
 
+    // update visibility
     this.isVisible = false;
 };
 
+/**
+* @description Reset item state.
+* This also calculates the initial position of the item
+* using random number.
+*/
 Item.prototype.reset = function() {
     var minC = minXItem/colWidth;
     var minR = minYItem/rowHeight;
@@ -321,6 +421,9 @@ Item.prototype.reset = function() {
     this.isVisible = true;
 };
 
+/**
+* @description Draw the item on screen if visible
+*/
 Item.prototype.render = function() {
     if (!this.isVisible) return;
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
@@ -335,7 +438,6 @@ gameMode = 'player-selection';
 
 // game state
 // active - game is running
-// 
 gameState = 'active';
 
 allSelectees = [];
