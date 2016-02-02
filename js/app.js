@@ -357,7 +357,7 @@ for (var i=0; i<numOfEnemies; i++) {
     var row = (i % 3) + 1;
     var multiplier = (i % 5) + 1;
     allEnemies[i] = new Enemy();
-    allEnemies[i].y = row * rowHeight;
+    allEnemies[i].y = minYEnemy + (row * rowHeight);
     allEnemies[i].speed *= multiplier;
 }
 
